@@ -35,25 +35,57 @@ def phase_shift(iptsignal, angle, dt):
 
 r_prime = np.zeros((3,10))
 
-"""f = np.arange(5)[1:5][np.newaxis].T*1/4
-t = np.arange(6)[1:5]
-#t = np.arange(5)[1:5]
-print(f*t)
+F=3         # number of frequencies
+T = 300     # number of points in time vector t
+f = np.linspace(1, 5, F).reshape(F,1)*1/4
+t = np.linspace(1,5,T)
+#print(f*t)
 sinus = np.sin(2*np.pi*f*t)
-print('sin:', sinus)
+#print('sin:', sinus)
 
+# Plot original signals
+plt.figure()
+plt.plot(t, np.transpose(sinus))
+print(np.shape(sinus))
+
+# FFT
 FFT = np.fft.rfft(sinus,axis=1)
 freq = np.fft.rfftfreq(len(t))
+freq = np.reshape(freq, (len(freq),1))
 #print('freqs:', freq)
 
+
+# Plot of FFT
+plt.figure()
+plt.plot(freq, np.transpose(FFT))
+
+# Shift
 shift = -90
 FFT *= np.exp(1j*np.deg2rad(shift))
 #print('FFT shifted:', FFT)
+
+# inverse FFT
 #iFFT = np.fft.irfft(FFT, n=len(sinus))
 iFFT = np.fft.irfft(FFT,axis=1)
-print('Inverse shifted FFT:', iFFT)"""
+#print('Inverse shifted FFT:', iFFT)
 
+# Plot of inverse FFT
+plt.figure()
+plt.plot(t, np.transpose(iFFT))
 
+# More plots
+plt.figure()
+plt.plot(t, np.transpose(sinus),'b')
+plt.plot(t, np.transpose(iFFT),'r--')
+
+for freq_ind in range(F):
+    plt.figure()
+    plt.plot(t, np.transpose(sinus)[:,freq_ind],'b')
+    plt.plot(t, np.transpose(iFFT)[:,freq_ind],'r--')
+
+plt.show()
+
+'''
 if __name__ == '__main__':
     # Define Time range
     time = np.arange(0, 10000)
@@ -78,9 +110,9 @@ if __name__ == '__main__':
     # Comparasion between Personal shifted and Hilbert transform result
     axes[1].plot(time, signal, label="Cosine (raw)")
     axes[1].plot(time, phsignal, label="Shift")
-    axes[1].plot(time, np.imag(hilbert(signal)), "--", label="Hilbert")
+    #axes[1].plot(time, np.imag(hilbert(signal)), "--", label="Hilbert")
     axes[1].set_xlabel("Time")
     axes[1].set_ylabel("Amplitude")
     axes[1].set_title("Comparison between shifted signal and Hilbert transform format")
     axes[1].legend()
-    plt.show()
+    plt.show()'''
