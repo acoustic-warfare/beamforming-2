@@ -24,8 +24,8 @@ def generate_array_signals(r_prime, sources, t):
     Audio_signal = np.zeros((len(t), len(r_prime[0,:])))
 
     for sample in range(len(t)):
-        if (sample+1 in np.arange(0,len(t),10)) or (sample == 0): # print stuff so user know how many samples that have been generated
-            print(sample+1)                                         # print stuff so user know how many samples that have been generated
+        #if (sample+1 in np.arange(0,len(t),10)) or (sample == 0): # print stuff so user know how many samples that have been generated
+        #    print(sample+1)                                         # print stuff so user know how many samples that have been generated
         for mic in range(len(r_prime[0,:])):
             x_i = r_prime[0,mic]
             y_i = r_prime[1,mic]
@@ -52,9 +52,9 @@ def calc_r_prime(d):
     r_prime = np.zeros((2, config.elements))
     element_index = 0
     for row in range(config.rows):
-        for col in range(config.columns*config.arrays):
+        for col in range(config.columns*config.active_arrays):
 
-            r_prime[0,element_index] = col * d - config.columns * config.arrays * half + half
+            r_prime[0,element_index] = col * d - config.columns * config.active_arrays * half + half
             r_prime[1, element_index] = row * d - config.rows * half + half
             element_index += 1
 
@@ -62,8 +62,7 @@ def calc_r_prime(d):
         plt.figure()
         plt.title('Array setup')
         plt.scatter(r_prime[0,:], r_prime[1,:].T)
-        plt.xlim([-(d*config.columns * config.arrays/2 + d) , d*config.columns * config.arrays/2 + d])
-
+        plt.xlim([-(d*config.columns * config.active_arrays/2 + d) , d*config.columns * config.active_arrays/2 + d])
     return r_prime
 
 def main():
@@ -91,9 +90,9 @@ def main():
 
 
     # GENERATE AUDIO SIGNAL
+    global emulated_signals
     emulated_signals = generate_array_signals(r_prime, sources, t)
     np.save('emulated_data/'+filename, emulated_signals)        # save to file
 
     print('Audio signals generated')
-
-main()
+#main()
