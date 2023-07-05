@@ -42,8 +42,8 @@ T = N
 t = np.linspace(0,N/fs,T)
 t = np.reshape(t, (len(t),1,1,1))
 f = calc_phase_shift_cartesian.f
-print('Scanning window:\n' + 'theta:', int(np.rad2deg(theta)[0,0,0,0]), 'to', int(np.rad2deg(theta)[0,0,len(theta[0,0,:,0])-1,0]), 'deg')
-print('phi:', int(np.rad2deg(phi)[0,0,0,0]), 'to', int(np.rad2deg(phi)[0,0,0,len(phi[0,0,0,:])-1]), 'deg')
+print('Scanning window:\n' + 'theta:', -int(np.rad2deg(theta)[0,0,0,round(config.y_res/2)]), 'to', int(np.rad2deg(theta)[0,0,config.x_res-1,round(config.y_res/2)]), 'deg')
+#print('phi:', int(np.rad2deg(phi)[0,0,0,0]), 'to', int(np.rad2deg(phi)[0,0,0,len(phi[0,0,0,:])-1]), 'deg')
 
 x_scan = calc_phase_shift_cartesian.x_scan
 y_scan = calc_phase_shift_cartesian.y_scan
@@ -107,10 +107,12 @@ def main():
     max_indxes = np.unravel_index(np.argmax(FFT_power), np.shape(FFT_power))
     x_max_indx = max_indxes[1]
     y_max_indx = max_indxes[2]
+    print(x_max_indx)
+    print(y_max_indx)
 
     print('Strongest source found at:')
-    print('theta =', np.rad2deg(theta[0,0,x_max_indx,0]))
-    print('phi =', np.rad2deg(np.arctan(y_scan[0,0,0,y_max_indx]/x_scan[0,0,x_max_indx,0])))
+    print('theta =', np.rad2deg(theta[0,0,x_max_indx,y_max_indx]))
+    print('phi =', np.rad2deg(np.arctan2(y_scan[0,0,0,y_max_indx],x_scan[0,0,x_max_indx,0])))
 
     ## 3D plot
     #fig = plt.figure()
