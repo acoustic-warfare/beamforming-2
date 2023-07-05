@@ -1,0 +1,8 @@
+def generate_filename():
+    if config.sources == 1:
+        filename ='emul_'+ 'samples='+str(config.samples) + '_'+ str(config.f_start1)+'Hz_'+'theta='+str(config.theta_deg1)+'_phi='+str(config.phi_deg1)+ \
+            '_E'+ str(config.rows*config.columns) + '_A'+str(config.active_arrays)
+    elif config.sources == 2:
+        filename ='emul_'+'samples='+str(config.samples) + '_'+str(config.f_start1)+str(config.f_start2)+'Hz_'+'theta='+str(config.theta_deg1)+str(config.theta_deg2)+ \
+        '_phi='+str(config.phi_deg1)+str(config.phi_deg2)+'_E'+ str(config.rows*config.columns) + '_A'+str(config.active_arrays)
+    return filename
