@@ -25,8 +25,14 @@ x_scan = np.reshape(x_scan, (1,1,len(x_scan),1))    # reshape into 4D arrays
 y_scan = np.reshape(y_scan, (1,1,1,len(y_scan)))    # reshape into 4D arrays
 
 
-theta = np.arctan(x_scan/config.z_scan)
-phi = np.arctan(y_scan/x_scan)
+#theta = np.arctan(x_scan/config.z_scan)
+theta = np.arccos(config.z_scan/(np.sqrt(x_scan**2 + y_scan**2 + config.z_scan**2)))
+phi = np.arctan2(y_scan,x_scan)
+print('theta:', np.rad2deg(theta))
+print('phi:', np.rad2deg(phi))
+print(np.shape(theta))
+print(np.shape(phi))
+
 
 theta_source1 = config.theta_deg1    # degrees
 phi_source1 = config.phi_deg1        # degrees
@@ -50,4 +56,4 @@ k = 2*np.pi*f/c      # wave number
 
 phase_shift_matrix = -k*(x_i*sin_theta*cos_phi + y_i*sin_theta*sin_phi) # rows = frequencies, columns = array elements, depth = theta, fourth dimension = phi
 phase_shift = np.exp(1j*phase_shift_matrix)
-#print(np.shape(phase_shift))
+print(np.shape(phase_shift))
