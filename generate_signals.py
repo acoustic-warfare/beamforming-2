@@ -7,15 +7,6 @@ import math
 
 import config
 
-def generate_filename():
-    if config.sources == 1:
-        filename ='emul_'+ 'samples='+str(config.samples) + '_'+ str(config.f_start1)+'Hz_'+'theta='+str(config.theta_deg1)+'_phi='+str(config.phi_deg1)+ \
-            '_A'+str(config.active_arrays)
-    elif config.sources == 2:
-        filename ='emul_'+'samples='+str(config.samples) + '_'+str(config.f_start1)+str(config.f_start2)+'Hz_'+'theta='+str(config.theta_deg1)+str(config.theta_deg2)+ \
-        '_phi='+str(config.phi_deg1)+str(config.phi_deg2)+'_A'+str(config.active_arrays)
-    return filename
-
 def r_vec(theta,phi):
     r = np.array([(math.sin(theta)*math.cos(phi)), math.sin(theta)*math.sin(phi), math.cos(theta)])
     return r
@@ -47,26 +38,38 @@ def generate_array_signals(r_prime, sources, t):
             Audio_signal[sample,mic] = temp_signal_sample
     return Audio_signal
 
+#def calc_r_prime(d):
+#    half = d/2
+#    r_prime = np.zeros((2, config.elements))
+#    element_index = 0
+#    for row in range(config.rows):
+#        for col in range(config.columns*config.active_arrays):
+#
+#            r_prime[0,element_index] = col * d - config.columns * config.active_arrays * half + half
+#            r_prime[1, element_index] = row * d - config.rows * half + half
+#            element_index += 1
+#
+#    if config.plot_setup:
+#        plt.figure()
+#        plt.title('Array setup')
+#        plt.scatter(r_prime[0,:], r_prime[1,:].T)
+#        plt.xlim([-(d*config.columns * config.active_arrays/2 + d) , d*config.columns * config.active_arrays/2 + d])
+#    return r_prime
 def calc_r_prime(d):
     half = d/2
     r_prime = np.zeros((2, config.elements))
     element_index = 0
-    for row in range(config.rows):
-        for col in range(config.columns*config.active_arrays):
-
-            r_prime[0,element_index] = col * d - config.columns * config.active_arrays * half + half
-            r_prime[1, element_index] = row * d - config.rows * half + half
-            element_index += 1
-
-    if config.plot_setup:
-        plt.figure()
-        plt.title('Array setup')
-        plt.scatter(r_prime[0,:], r_prime[1,:].T)
-        plt.xlim([-(d*config.columns * config.active_arrays/2 + d) , d*config.columns * config.active_arrays/2 + d])
+    for array in range(config.active_arrays):
+        for row in range(config.rows):
+            for col in range(config.columns):
+                r_prime[0,element_index] = col * d + half + array*config.columns*d + array*config.d - config.columns* config.active_arrays * half
+                r_prime[1, element_index] = row * d - config.rows * half + half
+                element_index += 1
+    r_prime[0,:] -= config.active_arrays*config.d/2
     return r_prime
 
-def main():
-    filename = generate_filename()  # generate filename
+def main(filename):
+    #filename = generate_filename()  # generate filename
 
     r_prime = calc_r_prime(config.distance) # calculate r_prime for the array setup
 
