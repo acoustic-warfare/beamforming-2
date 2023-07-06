@@ -28,7 +28,7 @@ def get_samples():
     out = np.empty(config.BUFFER_LENGTH, dtype=np.float32)
     out_pointer = out.ctypes.data_as(
         ctypes.POINTER(ctypes.c_float))
-    max_vals = np.array([])
+    #max_vals = np.array([])
     times = np.array([])
     i = 0
     while(True):
@@ -38,9 +38,12 @@ def get_samples():
         signals = signals[:,0:config.ROWS*config.COLUMNS] # Use when only having one array, comment out otherwise
         #print(np.shape(signals))
         heatmap_data = phase_shift_algorithm_real_data.main(signals)
-        #indxs = np.unravel_index(np.argmax(heatmap_data), np.shape(heatmap_data))
-        #max_vals = np.append(max_vals, heatmap_data[indxs[0],indxs[1]])
         #print(heatmap_data, heatmap_data.dtype, heatmap_data.shape)
+
+        #indxs = np.unravel_index(np.argmax(heatmap_data), np.shape(heatmap_data))
+        #max_val = heatmap_data[indxs[0],indxs[1]]
+        #heatmap_data /= max_val    # normalizing with maximum value
+
         heatmap_data /= 34000
         heatmap_data *= 255
         try:
