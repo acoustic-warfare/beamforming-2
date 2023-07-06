@@ -1,49 +1,31 @@
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 import config
-import generate_signals
+import config_beamforming
+import calc_r_prime
 
-def find_nearest(array, value):
-    idx = np.argmin((np.abs(array - value)))
-    return idx
-
-c = config.c
-fs = config.f_sampling
-N = config.samples
-d = config.distance
-r_prime = generate_signals.calc_r_prime(d)
+c = config_beamforming.c
+fs = config.fs
+N = config.N_SAMPLES
+d = config_beamforming.distance
+r_prime = calc_r_prime.calc_r_prime(d)
 x_i = r_prime[0,:]
 y_i = r_prime[1,:]
-theta_max = config.alpha/2
-x_scan_max = config.z_scan*np.tan(np.deg2rad(theta_max))
+
+# Scanning window
+theta_max = config_beamforming.alpha/2
+z_scan = config_beamforming.z_scan
+x_scan_max = z_scan*np.tan(np.deg2rad(theta_max))
 x_scan_min = -x_scan_max
-y_scan_max = x_scan_max/config.aspect_ratio
+y_scan_max = x_scan_max/config_beamforming.aspect_ratio
 y_scan_min = -y_scan_max
-x_scan = np.linspace(x_scan_min,x_scan_max,config.x_res)
-y_scan = np.linspace(y_scan_min,y_scan_max,config.y_res)
-x_scan = np.reshape(x_scan, (1,1,len(x_scan),1))    # reshape into 4D arrays
-y_scan = np.reshape(y_scan, (1,1,1,len(y_scan)))    # reshape into 4D arrays
+x_scan = np.linspace(x_scan_min,x_scan_max,config_beamforming.x_res)
+y_scan = np.linspace(y_scan_min,y_scan_max,config_beamforming.y_res)
+x_scan = np.reshape(x_scan, (1,1,len(x_scan),1))
+y_scan = np.reshape(y_scan, (1,1,1,len(y_scan)))
 
-
-#theta = np.arctan(x_scan/config.z_scan)
-theta = np.arccos(config.z_scan/(np.sqrt(x_scan**2 + y_scan**2 + config.z_scan**2)))
+theta = np.arccos(z_scan/(np.sqrt(x_scan**2 + y_scan**2 + z_scan**2)))
 phi = np.arctan2(y_scan,x_scan)
-print('theta:', np.rad2deg(theta))
-print('phi:', np.rad2deg(phi))
-print(np.shape(theta))
-print(np.shape(phi))
-
-
-theta_source1 = config.theta_deg1    # degrees
-phi_source1 = config.phi_deg1        # degrees
-theta_source1_indx = find_nearest(theta,np.deg2rad(theta_source1))
-phi_source1_indx = find_nearest(phi,np.deg2rad(phi_source1))
-
-
-theta_source2 = config.theta_deg2    # degrees
-phi_source2 = config.phi_deg2        # degrees
-theta_source2_indx = find_nearest(theta,np.deg2rad(theta_source2))
-phi_source2_indx = find_nearest(phi,np.deg2rad(phi_source2))
 
 f = np.linspace(0,int(fs/2),int(N/2)+1)
 f = np.reshape(f, (len(f),1,1,1))
@@ -54,6 +36,6 @@ cos_phi = np.cos(phi)
 sin_phi = np.sin(phi)
 k = 2*np.pi*f/c      # wave number
 
-phase_shift_matrix = -k*(x_i*sin_theta*cos_phi + y_i*sin_theta*sin_phi) # rows = frequencies, columns = array elements, depth = theta, fourth dimension = phi
+phase_shift_matrix = -k*(x_i*sin_theta*cos_phi + y_i*sin_theta*sin_phi) # rows = frequencies, columns = array elements, depth = x, fourth dimension = y
 phase_shift = np.exp(1j*phase_shift_matrix)
-print(np.shape(phase_shift))
+#print(np.shape(phase_shift))
