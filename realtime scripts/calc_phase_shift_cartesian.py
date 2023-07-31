@@ -1,22 +1,25 @@
 import numpy as np
 np.set_printoptions(threshold=np.inf)
+import time
 import config
 import calc_r_prime
+import calc_mode_matrix
+import calc_mode_matrices
+#import active_microphones_modes as amm
 
 print('\nCalculate phase shift matrix')
 c = config.PROPAGATION_SPEED
-fs = config.fs
+fs = int(config.fs)
 N = config.N_SAMPLES
 d = config.ELEMENT_DISTANCE
 theta_max = config.VIEW_ANGLE/2
 
 # microphone coordinates
-r_prime = calc_r_prime.calc_r_prime(d)
+r_prime_all, r_prime = calc_r_prime.calc_r_prime(d)
 x_i = r_prime[0,:]
 y_i = r_prime[1,:]
 x_i = np.reshape(x_i, (1,len(x_i),1,1))
 y_i = np.reshape(y_i, (1,len(y_i),1,1))
-
 # scanning window
 x_scan_max = config.Z*np.tan(np.deg2rad(theta_max))
 x_scan_min = -x_scan_max
@@ -40,3 +43,9 @@ phi = np.arctan2(y_scan,x_scan)
 phase_shift_matrix = -k*((x_scan*x_i + y_scan*y_i) / r_scan) # rows = frequencies, columns = array elements, depth = theta, fourth dimension = phi
 phase_shift = np.exp(1j*phase_shift_matrix)
 #print(np.shape(phase_shift))
+
+
+phase_shift_modes, n_active_mics = calc_mode_matrix.mode_matrix(phase_shift)
+#print(np.shape(mode_matrix))
+
+mode_matrices, mode_intervals, active_mics_mode_list = calc_mode_matrices.calc_mode_matrices(phase_shift)

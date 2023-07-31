@@ -24,7 +24,8 @@ def display_video_sound_heatmap(src, replayMode, replayNumber, convolveBackend):
     
     FPS = 1/256
     FPS_MS = int(FPS * 1000)
-    
+    #FPS_MS = 1
+
     #Prepare a replay transmission
     if replayMode:
         replay = Replay(replayNumber)
@@ -34,18 +35,18 @@ def display_video_sound_heatmap(src, replayMode, replayNumber, convolveBackend):
         thread1 = Thread(target=replay.beginReplayTransmission, args=())
         thread1.daemon = True
         thread1.start()
-    time.sleep(1)
+    #time.sleep(1)
     #Play sound
     thread2 = Thread(target=soundPlayer.play_sound, args=())
     thread2.daemon = True
     thread2.start()
 
-    time.sleep(4)
+    #time.sleep(2)
     
     times = np.array([])
     i = 0
     while True:
-            
+            start = time.time()
             status, frame = capture.read()
             try:
                 frame = cv2.resize(frame, config.WINDOW_SIZE)
@@ -55,10 +56,11 @@ def display_video_sound_heatmap(src, replayMode, replayNumber, convolveBackend):
 
             data = np.empty((config.N_MICROPHONES, config.N_SAMPLES), dtype=np.float32)
             receive(data)
+
             #print(np.shape(frame))
-            start = time.time()
+            
             heatmap_data = phase_shift_algorithm_peak_detection.main(data.T)
-            end = time.time()
+            
             heatmap_data *= 255
             heatmap = heatmap_data.astype('uint8')
             heatmap = cv2.resize(heatmap, (720, 480))
@@ -73,8 +75,9 @@ def display_video_sound_heatmap(src, replayMode, replayNumber, convolveBackend):
             dst = cv2.resize(dst, (1920, 1080))
             cv2.imshow(config.APPLICATION_NAME, dst)
             cv2.waitKey(FPS_MS)
-            
-            if i > 3:
+            end = time.time()
+
+            if i > 6:
                 sim_time = round((end - start), 4)  # single loop simulation time
                 #print('Individual loop time:', sim_time, 's')
                 times = np.append(times, sim_time)
