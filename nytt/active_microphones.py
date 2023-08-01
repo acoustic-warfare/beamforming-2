@@ -27,12 +27,19 @@ def active_microphones():
         microphones = np.hstack((microphones, array))
 
     # take out the active microphones from the microphones matrix, save in list active_mics
+    try:
+        unused_mics = np.load('unused_mics.npy')
+    except:
+        unused_mics = []
     active_mics = []
     for r in rows:
         for c in columns:
             mic = microphones[r,c]
-            active_mics.append(int(mic))
+            if mic not in unused_mics:
+                #continue
+                active_mics.append(int(mic))
 
     # sort the list such that the mic indexes are in ascending order
     active_mics = np.sort(active_mics)
     return active_mics
+
