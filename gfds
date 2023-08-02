@@ -1,0 +1,2 @@
+    filename = generate_filename()+'_xres='+str(config.x_res)+'_yres='+str(config.x_res)+'latest'
+    plt.savefig('plots/rainbow_road/'+filename+'.png', dpi = 500, format = 'png', bbox_inches='tight')
