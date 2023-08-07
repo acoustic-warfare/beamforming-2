@@ -4,7 +4,7 @@ import config
 import active_microphones as am
 
 from matplotlib import rc # only for plot
-camera_offset = 0.11    # [m]
+camera_offset = 0.11      # [m]
 
 def calc_r_prime(d):
     half = d/2
