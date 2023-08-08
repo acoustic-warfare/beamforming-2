@@ -1,0 +1,10 @@
+X, Y = np.meshgrid(np.arange(config.MAX_RES_X), np.arange(config.MAX_RES_Y))
+
+norm = cm.Normalize(vmin=a.min().min(), vmax=a.max().max())
+fig = plt.figure(figsize=(10,8))
+ax = fig.add_subplot(1,1,1, projection='3d')
+fig.subplots_adjust(top=1.1, bottom=-.1)                         
+ax.view_init(azim=-45, elev=45)
+ax.set_box_aspect([4, 3, 3])
+surf = ax.plot_surface(X, Y, a.T, rstride=1, cstride=1, facecolors=plt.cm.jet(norm(a.T)), linewidth=0, antialiased=True, shade=False)
+ax.axis('off')
