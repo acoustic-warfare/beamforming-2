@@ -93,37 +93,37 @@ y_scan = np.linspace(y_scan_min, y_scan_max, y_res).reshape(1, y_res,1)
 r_scan = np.sqrt(x_scan**2 + y_scan**2 + z_scan**2) # distance between middle of array to the xy-scanning coordinate
 
 
-# --- code based on matlab for DOA MVDR --
-fs = config.SAMPLE_RATE
+fs = config.fs
 N = 512                         # number of samples
 M = config.ELEMENTS             # number of array elements
+P = config.sources              # number of sources
 c = config.PROPAGATION_SPEED    
-f = 4 * 10**3                   # frequency that the MVDR algorithm is based on
+f = 1.5 * 10**3                 # frequency that the music algorithm is based on
 k = 2*math.pi*f / c             # wavenumber
 d = config.ELEMENT_DISTANCE             # distance between elements
-
 N_elements = signal.shape[1]
 
-psi =  (x_scan*x_i + y_scan*y_i) / r_scan 
-S = np.exp(-1j*k*psi).reshape(x_res, y_res, N_elements, 1)   # steering matrix
+psi =  (x_scan*x_i + y_scan*y_i) / r_scan
+S = np.exp(1j*k*psi).reshape(x_res, y_res, N_elements,1)   # steering matrix
 
 # MVDR ALGORITHM STARTS HERE
 start = time.time()
+print(signal.shape)
 x = np.fft.rfft(signal.T,axis=1)    # FFT each signal (signal for music algorithm is assumed to be complex)
-#x = np.fft.ifft(signal.T,axis=1)
-x = signal.T
-#x = signal.T
-R = (x @ x.conj().transpose())/ N   # calculate covariance matrix and normalize with number of samples
+
+R = (x @ x.conj().transpose()) / N   # calculate covariance matrix and normalize with number of samples
+
 
 #https://dsp.stackexchange.com/questions/60091/implementing-mvdr-beamformer-in-the-stft-domain
 # https://www.mathworks.com/help/phased/ref/phased.mvdrbeamformer-system-object.html
 invR = np.linalg.pinv(R)
-MVDR = np.zeros((x_res,y_res))     # heatmap for MVDR algorithm
+MVDR = np.zeros((x_res,y_res))     # heatmap for music algorithm
+#for ff in range(10):
 for jj in range(y_res):
-    for ii in range(x_res):
-        SS = S[ii,jj,:]                                     # stearing matrix for a specific direction
+    for ii in range(x_res): 
+        SS = S[ii,jj,:,:]                                     # stearing matrix for a specific direction
         denominator = SS.conj().transpose() @ invR @ SS
-        P = 1/denominator[0,0]                              # power in the specified direction
+        P = 1/denominator[0,0]
         MVDR[ii,jj] = abs(P)
 #MVDR = 10*np.log10(MVDR)
 end = time.time()
